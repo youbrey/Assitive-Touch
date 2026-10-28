@@ -145,6 +145,10 @@ class AssistiveOverlayService : Service() {
             gravity = Gravity.TOP or Gravity.START
             x = initialPosX
             y = initialPosY
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                // Support full screen cutout (waterdrop notch on Redmi Note 8 Pro)
+                layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            }
         }
 
         touchView.buttonTheme = currentSettings.theme

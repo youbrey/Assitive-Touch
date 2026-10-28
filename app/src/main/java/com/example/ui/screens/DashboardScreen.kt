@@ -40,9 +40,12 @@ import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.BatteryChargingFull
+import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import com.example.util.MiuiDeviceHelper
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -120,6 +123,9 @@ fun DashboardScreen(
             onGrantOverlay = { requestOverlayPermission(context) },
             onGrantAccessibility = { requestAccessibilityPermission(context) }
         )
+
+        // Khusus Redmi Note 8 Pro & Android 10 (MIUI Optimization)
+        RedmiMiuiOptimizationCard(context = context)
 
         // Interactive Live Preview Playground
         InteractivePlaygroundCard(
@@ -642,5 +648,168 @@ private fun requestAccessibilityPermission(context: Context) {
         context.startActivity(intent)
     } catch (_: Exception) {
         // Fallback
+    }
+}
+
+@Composable
+fun RedmiMiuiOptimizationCard(context: Context) {
+    val isRedmi = remember { MiuiDeviceHelper.isRedmiNote8Pro() || MiuiDeviceHelper.isMiuiDevice() }
+    val isBatteryOptimized = remember { MiuiDeviceHelper.isBatteryOptimizationIgnored(context) }
+    val deviceSummary = remember { MiuiDeviceHelper.getDeviceSummary() }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("redmi_miui_optimization_card"),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = CardSurfaceDark),
+        border = CardDefaults.outlinedCardBorder().copy(brush = androidx.compose.ui.graphics.SolidColor(CardSurfaceBorder))
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    modifier = Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.PhoneAndroid,
+                        contentDescription = null,
+                        tint = CyanAccent,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Optimasi Redmi Note 8 Pro & Android 10",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(CyanAccent.copy(alpha = 0.15f))
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = "MIUI 11/12",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = CyanAccent
+                    )
+                }
+            }
+
+            Text(
+                text = "Perangkat terdeteksi: $deviceSummary\nSistem MIUI pada Android 10 memiliki manajemen baterai dan RAM yang ketat. Aktifkan 3 setelan di bawah agar tombol virtual tidak tertutup:",
+                fontSize = 12.sp,
+                color = Slate400,
+                lineHeight = 16.sp
+            )
+
+            // Step 1: Autostart (Mulai Otomatis)
+            MiuiSettingRow(
+                title = "1. Izin Mulai Otomatis (Autostart)",
+                description = "Wajib agar tombol virtual tidak mati saat pembersihan RAM latar belakang",
+                actionLabel = "Buka Autostart",
+                onClick = { MiuiDeviceHelper.openMiuiAutostart(context) }
+            )
+
+            // Step 2: Pop-up windows while running in background
+            MiuiSettingRow(
+                title = "2. Izin Jendela Pop-up MIUI",
+                description = "Izin khusus MIUI agar tombol dapat melayang di atas semua aplikasi",
+                actionLabel = "Atur Pop-up",
+                onClick = { MiuiDeviceHelper.openMiuiPopupPermission(context) }
+            )
+
+            // Step 3: No restrictions battery saver
+            MiuiSettingRow(
+                title = "3. Penghemat Baterai: Tidak Ada Pembatasan",
+                description = if (isBatteryOptimized) "Sudah dioptimalkan (Tidak dibatasi)" else "Pilih 'Tidak Ada Pembatasan' agar MIUI tidak mematikan service",
+                actionLabel = "Setel Baterai",
+                isCompleted = isBatteryOptimized,
+                onClick = { MiuiDeviceHelper.openMiuiBatterySaver(context) }
+            )
+
+            // Tip Banner
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(0xFF0F172A).copy(alpha = 0.8f))
+                    .padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "💡 Tips Tambahan: Buka Recent Apps (geser ke atas), tahan kartu AssistiveTouch, lalu ketuk ikon gembok untuk mengunci aplikasi di memori.",
+                    fontSize = 11.sp,
+                    color = Color.White.copy(alpha = 0.8f),
+                    lineHeight = 15.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun MiuiSettingRow(
+    title: String,
+    description: String,
+    actionLabel: String,
+    isCompleted: Boolean = false,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color(0xFF0F172A).copy(alpha = 0.6f))
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                fontSize = 12.5.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.White
+            )
+            Text(
+                text = description,
+                fontSize = 10.5.sp,
+                color = Slate400,
+                lineHeight = 14.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Button(
+            onClick = onClick,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (isCompleted) EmeraldGlow else CyanAccent,
+                contentColor = Color(0xFF0A0F1D)
+            ),
+            shape = RoundedCornerShape(10.dp),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 10.dp, vertical = 6.dp)
+        ) {
+            Text(
+                text = if (isCompleted) "Selesai" else actionLabel,
+                fontSize = 11.5.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }

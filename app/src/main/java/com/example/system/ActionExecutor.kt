@@ -24,6 +24,10 @@ object ActionExecutor {
                 vibratorManager?.defaultVibrator?.vibrate(
                     VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK)
                 )
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                // Optimized for Android 10 (API 29 / Redmi Note 8 Pro)
+                val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+                vibrator?.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK))
             } else {
                 @Suppress("DEPRECATION")
                 val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
