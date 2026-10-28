@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">AssistiveTouch</string>
+    <string name="accessibility_service_description">Layanan aksesibilitas diperlukan untuk mengeksekusi perintah sistem seperti tangkapan layar, kunci layar, menu matikan daya / restart, tombol kembali, dan panel notifikasi tanpa perlu root.</string>
+    <string name="overlay_notification_title">Tombol Virtual Aktif</string>
+    <string name="overlay_notification_text">Assistive Touch berjalan di latar belakang.</string>
+    <string name="stop_service">Nonaktifkan</string>
+</resources>

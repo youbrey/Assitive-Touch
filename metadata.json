@@ -1,0 +1,6 @@
+{
+  "name": "AssistiveTouch",
+  "description": "Tombol virtual multi fungsi cerdas dengan kustomisasi gestur, tema ikon transparan, dan akses cepat sistem seperti tangkapan layar, kunci layar, kontrol volume, dan menu daya.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
